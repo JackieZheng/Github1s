@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Github1s
 // @namespace    https://github.com/JackieZheng/Github1s
-// @version      1.8
+// @version      1.9
 // @description  One second to read GitHub code with VS Code.
 // @author       JackieZheng
 // @match        https://github.com/*/*
@@ -35,7 +35,7 @@
 
         li.addEventListener('click', (e) => {
             e.preventDefault();
-            top.location.href = top.location.href.replace('github.com', host);
+            window.open(top.location.href.replace('github.com', host), '_blank', 'noopener');
         });
         return li;
     }
