@@ -13,9 +13,22 @@
 
 ## 安装
 
-1. 给浏览器安装 Tampermonkey（或兼容的用户脚本管理器）
-2. 打开仓库中的 `Github1s.user.js`，按提示完成安装
-   （也可直接访问该文件的 Raw 地址进行安装）
+### 前置条件
+浏览器已安装 Tampermonkey（或 Violentmonkey 等兼容的用户脚本管理器）。
+
+### 安装步骤
+1. **一键安装（推荐）**：在已装 Tampermonkey 的浏览器中，点击下面的 Raw 链接，
+   Tampermonkey 会自动识别 `.user.js` 并弹出「安装脚本」对话框，点「安装」即可：
+
+   👉 https://raw.githubusercontent.com/JackieZheng/Github1s/main/Github1s.user.js
+
+2. **手动安装**：打开仓库根目录的 `Github1s.user.js` 文件 → 点击右上角 **Raw** 按钮
+   → 浏览器自动转入安装流程。
+
+3. **仪表盘导入**：Tampermonkey 仪表盘 → 实用工具 → 导入 → 粘贴上面的 Raw URL。
+
+安装完成后，访问任意 `https://github.com/<owner>/<repo>` 页面，操作栏最前方即出现
+**Github1s / GitMcp / GitDiagram** 三个绿色按钮，点击各在新标签页打开对应镜像站。
 
 ## 兼容性
 
