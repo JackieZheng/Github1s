@@ -1,14 +1,17 @@
 # Github1s 油猴脚本 · 仓库页快捷入口
 
-在 GitHub 任意仓库页的操作栏（Pin / Watch / Fork / Star 之前）注入三个自定义按钮，
-一键在新标签页打开对应的代码浏览 / AI 辅助镜像站，省去手动改域名的麻烦。
+在 GitHub 任意仓库页的操作栏（Pin / Watch / Fork / Star 之前）注入一个 Github1s 下拉按钮，
+主按钮默认打开 Github1s，点击箭头展开全部镜像站，一键在新标签页打开对应的代码浏览 / AI 辅助镜像站，省去手动改域名的麻烦。
 
 ## 功能特性
 
 - **Github1s**：将 `github.com` 替换为 `github1s.com`，用 VS Code 在线读码
 - **GitMcp**：将 `github.com` 替换为 `gitmcp.io`，为当前仓库提供 MCP 服务入口
 - **GitDiagram**：将 `github.com` 替换为 `gitdiagram.com`，一键生成仓库结构图
-- 三个按钮均以新标签页打开，不会离开正在浏览的仓库页
+- **DeepWiki**：将 `github.com` 替换为 `deepwiki.com`，生成 wiki 式多页文档并支持 AI 问答
+- **Zread**：将 `github.com` 替换为 `zread.ai`，生成结构化 AI 文档与项目洞察
+- **GitIngest**：将 `github.com` 替换为 `gitingest.com`，把整个仓库转成可喂给 LLM 的文本摘要
+- 六个入口均以新标签页打开，不会离开正在浏览的仓库页；主按钮默认 Github1s，箭头展开其余 5 个镜像站
 - 自动锚定 GitHub 操作栏，兼容页面重构与 SPA 软导航，按钮不会因局部刷新而消失
 
 ## 安装
@@ -28,7 +31,7 @@
 3. **仪表盘导入**：Tampermonkey 仪表盘 → 实用工具 → 导入 → 粘贴上面的 Raw URL。
 
 安装完成后，访问任意 `https://github.com/<owner>/<repo>` 页面，操作栏最前方即出现
-**Github1s / GitMcp / GitDiagram** 三个绿色按钮，点击各在新标签页打开对应镜像站。
+一个 **Github1s** 下拉按钮：主按钮默认打开 Github1s，点击箭头展开 **GitMcp / GitDiagram / DeepWiki / Zread / GitIngest** 共 6 个镜像站，点击各在新标签页打开对应站点。
 
 ## 兼容性
 
@@ -41,7 +44,7 @@
 
 ## 原理简述
 
-脚本启动后查找仓库页操作栏，在其中第一个按钮之前插入三个 `<li>` 按钮；
+脚本启动后查找仓库页操作栏，在其中第一个按钮之前插入一个下拉按钮 `<li>`；
 每个按钮点击时把当前地址的 `github.com` 替换为目标域名并新开标签页。
 由于 GitHub 会用 Turbo / React 重新渲染该区域，脚本采用持续监听 + 去重
 （已注入则跳过）的方式保证按钮长期存在。

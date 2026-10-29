@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Github1s
 // @namespace    https://github.com/JackieZheng/Github1s
-// @version      1.9
+// @version      1.11
 // @description  One second to read GitHub code with VS Code.
 // @author       JackieZheng
 // @match        https://github.com/*/*
@@ -16,27 +16,106 @@
     GM_addStyle(`
         anchored-position { display: none !important; }
         anchored-position[class$="popover-open"] { display: block !important; }
-        .github1s-custom-btn { margin-right: 4px; }
+
+        /* 下拉容器：只占一个按钮宽度，不再撑宽操作栏 */
+        .github1s-wrap { position: relative; display: inline-block; margin-right: 4px; }
+        .github1s-main {
+            border-top-right-radius: 0 !important;
+            border-bottom-right-radius: 0 !important;
+            margin-right: 0 !important;
+        }
+        .github1s-caret {
+            border-top-left-radius: 0 !important;
+            border-bottom-left-radius: 0 !important;
+            margin-left: -1px !important;
+            width: 22px;
+        }
+        .github1s-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 100;
+            margin: 4px 0 0;
+            padding: 4px 0;
+            list-style: none;
+            background: #fff;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(140,149,159,.2);
+            min-width: 150px;
+        }
+        .github1s-menu li > a {
+            display: block;
+            padding: 4px 14px;
+            color: #24292f;
+            font-size: 12px;
+            line-height: 20px;
+            white-space: nowrap;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .github1s-menu li > a:hover { background: #f6f8fa; color: #0969da; }
     `);
 
     const buttons = [
         { text: 'Github1s', host: 'github1s.com' },
         { text: 'GitMcp', host: 'gitmcp.io' },
-        { text: 'GitDiagram', host: 'gitdiagram.com' }
+        { text: 'GitDiagram', host: 'gitdiagram.com' },
+        { text: 'DeepWiki', host: 'deepwiki.com' },
+        { text: 'Zread', host: 'zread.ai' },
+        { text: 'GitIngest', host: 'gitingest.com' }
     ];
 
-    function createButton({ text, host }) {
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        a.className = 'btn btn-sm btn-primary github1s-custom-btn';
-        a.textContent = text;
-        a.href = '#';
-        li.appendChild(a);
+    function openHost(host) {
+        window.open(top.location.href.replace('github.com', host), '_blank', 'noopener');
+    }
 
-        li.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.open(top.location.href.replace('github.com', host), '_blank', 'noopener');
+    // 单个下拉按钮：主按钮 = 默认项(Github1s)，箭头展开全部镜像站
+    function createDropdown() {
+        const li = document.createElement('li');
+        li.className = 'github1s-wrap';
+
+        const main = document.createElement('button');
+        main.type = 'button';
+        main.className = 'btn btn-sm btn-primary github1s-main';
+        main.textContent = buttons[0].text;
+        main.addEventListener('click', () => {
+            openHost(buttons[0].host);
+            menu.hidden = true;
         });
+
+        const caret = document.createElement('button');
+        caret.type = 'button';
+        caret.className = 'btn btn-sm btn-primary github1s-caret';
+        caret.setAttribute('aria-label', '更多镜像站');
+        caret.textContent = '▾';
+
+        const menu = document.createElement('ul');
+        menu.className = 'github1s-menu';
+        menu.hidden = true;
+        buttons.forEach(({ text, host }) => {
+            const mi = document.createElement('li');
+            const a = document.createElement('a');
+            a.textContent = text;
+            a.href = '#';
+            a.addEventListener('click', (e) => {
+                e.preventDefault();
+                openHost(host);
+                menu.hidden = true;
+            });
+            mi.appendChild(a);
+            menu.appendChild(mi);
+        });
+
+        caret.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            menu.hidden = !menu.hidden;
+        });
+
+        li.appendChild(main);
+        li.appendChild(caret);
+        li.appendChild(menu);
         return li;
     }
 
@@ -74,13 +153,11 @@
         if (!toolbar) return false;
 
         // 防止重复注入（SPA 局部刷新时会再次触发）
-        if (toolbar.querySelector('.github1s-custom-btn')) return true;
+        if (toolbar.querySelector('.github1s-wrap')) return true;
 
         const firstLi = toolbar.querySelector(':scope > li');
-        // 倒序插入，使最终顺序与 buttons 数组一致，且都位于原第一个按钮之前（即最前面）
-        for (let i = buttons.length - 1; i >= 0; i--) {
-            toolbar.insertBefore(createButton(buttons[i]), firstLi);
-        }
+        // 只注入一个下拉按钮，位于原第一个按钮之前（最前面）
+        toolbar.insertBefore(createDropdown(), firstLi);
         return true;
     }
 
@@ -103,6 +180,13 @@
     // 软导航 / 浏览器前进后退时强制重注入
     document.addEventListener('turbo:render', scheduleInject);
     window.addEventListener('popstate', scheduleInject);
+
+    // 点击页面其它地方时关闭已展开的下拉菜单（只注册一次）
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.github1s-wrap')) {
+            document.querySelectorAll('.github1s-menu:not([hidden])').forEach((m) => { m.hidden = true; });
+        }
+    });
 
     inject();
 })();
